@@ -40,6 +40,8 @@
       .app{grid-template-columns: 1fr; padding:12px}
       header{flex-direction:column; align-items:flex-start}
     }
+    footer{text-align:center; color:var(--muted); grid-column:1/-1; margin-top:20px}
+    #sendEmailBtn{background:var(--accent); color:#fff; border:none; padding:10px 18px; border-radius:10px; cursor:pointer; font-weight:600; margin-top:10px}
   </style>
 </head>
 <body>
@@ -76,10 +78,16 @@
         <div id="summary" style="margin-top:10px;color:var(--muted);">برای مقایسه، حداقل دو پکیج را انتخاب کن.</div>
       </div>
     </main>
+
+    <!-- new footer -->
+    <footer>
+      <p>بعد از انتخاب پکیج مورد نظر، روی دکمه زیر بزنید تا مشخصات به ایمیل ارسال شود:</p>
+      <button id="sendEmailBtn">ارسال به ایمیل</button>
+    </footer>
   </div>
 
   <script>
-    /***** نمونه داده‌ها — اینجا می‌تونی اضافه/ویرایش کنی یا بعداً از API بارگذاری کنی *****/
+    /***** داده‌های نمونه *****/
     const packages = [
       {
         id: "pkg-basic-1",
@@ -148,7 +156,7 @@
     const searchInput = document.getElementById('search');
     const filterSelect = document.getElementById('filter');
 
-    // render list based on filter & search
+    // render list
     function renderList(){
       const q = searchInput.value.trim().toLowerCase();
       const cat = filterSelect.value;
@@ -184,12 +192,11 @@
       });
     }
 
-    // render details for selected package
+    // render details
     function selectPackage(id){
       const pkg = packages.find(x => x.id === id);
       if(!pkg) return;
       selected = pkg;
-      // build details UI
       detailsEl.innerHTML = `
         <div style="display:flex;gap:16px;align-items:center;justify-content:space-between">
           <div>
@@ -211,28 +218,24 @@
         s.innerHTML = `<h4>${k.replaceAll('_',' ')}</h4><div style="color:var(--muted)">${v}</div>`;
         specsEl.appendChild(s);
       }
-
-      // attach compare handler
       document.getElementById('compareBtn').addEventListener('click', ()=> {
         toggleCompare(pkg.id);
       });
     }
 
-    // simple compare: keep list of selected ids in local state
+    // compare
     const compareSet = new Set();
     function toggleCompare(id){
       if(compareSet.has(id)) compareSet.delete(id);
       else compareSet.add(id);
       renderSummary();
     }
-
     function renderSummary(){
       if(compareSet.size === 0){
         summaryEl.textContent = 'برای مقایسه، حداقل دو پکیج را انتخاب کن.';
         return;
       }
       const arr = Array.from(compareSet).map(id => packages.find(p=>p.id===id));
-      // build table-like summary
       let html = '<div style="display:flex;gap:12px;overflow:auto">';
       arr.forEach(p=>{
         html += `<div style="min-width:220px;background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02)">
@@ -247,13 +250,28 @@
     // init
     renderList();
     renderSummary();
-
-    // events
     searchInput.addEventListener('input', ()=> renderList());
     filterSelect.addEventListener('change', ()=> renderList());
 
-    // optional: select first by default
-    // selectPackage(packages[0].id);
+    // send email
+    const sendBtn = document.getElementById('sendEmailBtn');
+    sendBtn.addEventListener('click', () => {
+      if(!selected){
+        alert("لطفاً ابتدا یک پکیج انتخاب کنید.");
+        return;
+      }
+      const subject = `درخواست اطلاعات پکیج: ${selected.name}`;
+      const body = `
+نام پکیج: ${selected.name}
+قیمت: ${selected.price}
+توضیح کوتاه: ${selected.short}
+
+ویژگی‌ها:
+${Object.entries(selected.features).map(([k,v]) => `${k}: ${v}`).join("\n")}
+      `;
+      const email = "planvestfirst@gmail.com";
+      window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    });
   </script>
 </body>
 </html>
