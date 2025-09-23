@@ -1,153 +1,259 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fa">
 <head>
-  <meta charset="UTF-8">
-  <title>Package Viewer</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>پکیج‌ها — نمایش مشخصات</title>
   <style>
-    body { font-family: Vazirmatn, sans-serif; background:#f7f9fb; margin:0; }
-    header { background:#4a90e2; color:#fff; padding:1rem; display:flex; justify-content:space-between; align-items:center; }
-    header h1 { margin:0; font-size:1.4rem; }
-    .controls { display:flex; gap:.5rem; }
-    main { display:flex; padding:1rem; gap:1rem; }
-    .sidebar { width:30%; background:#fff; padding:1rem; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,.1); overflow-y:auto; max-height:80vh; }
-    .card { padding:.8rem; border-bottom:1px solid #eee; cursor:pointer; transition:.2s; }
-    .card:hover { background:#f0f4ff; }
-    .content { flex:1; background:#fff; padding:1rem; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,.1); }
-    h2 { margin-top:0; }
-    .empty { color:#aaa; }
-    select, input { padding:.4rem; border-radius:6px; border:1px solid #ccc; }
+    :root{
+      --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#4f96ff; --glass: rgba(255,255,255,0.03);
+      --radius:14px; font-family: "Vazirmatn", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    html,body{height:100%; margin:0; background:linear-gradient(180deg,#071025 0%, #071b2b 100%); color:#e6eef8; direction:rtl}
+    .app{max-width:1100px; margin:28px auto; padding:24px; display:grid; grid-template-columns: 360px 1fr; gap:20px;}
+    header{grid-column:1/-1; display:flex; align-items:center; justify-content:space-between; gap:12px}
+    h1{margin:0; font-size:20px}
+    .controls{display:flex; gap:8px; align-items:center}
+    input[type="search"]{
+      background:var(--glass); border:1px solid rgba(255,255,255,0.04); color:var(--muted); padding:8px 12px; border-radius:10px;
+      outline:none; min-width:180px; color:var(--muted);
+    }
+    select{background:var(--glass); border:1px solid rgba(255,255,255,0.04); color:var(--muted); padding:8px 12px; border-radius:10px}
+    /* left column: packages list */
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:var(--radius); padding:14px; box-shadow: 0 6px 20px rgba(2,6,23,0.6);}
+    .list{display:flex; flex-direction:column; gap:10px; margin-top:10px; max-height:70vh; overflow:auto; padding-right:4px}
+    .card{background:linear-gradient(180deg,#071428,#061322); border-radius:12px; padding:12px; cursor:pointer; display:flex; gap:12px; align-items:center; border:1px solid rgba(255,255,255,0.03)}
+    .card:hover{transform:translateY(-4px); transition:.15s ease; box-shadow: 0 8px 30px rgba(15,100,255,0.06)}
+    .badge{background:linear-gradient(90deg,var(--accent),#7fc0ff); color:#02233b; font-weight:600; padding:6px 10px; border-radius:999px; font-size:13px}
+    .meta{display:flex; flex-direction:column}
+    .meta .title{font-weight:700; color:#eaf3ff}
+    .meta .desc{color:var(--muted); font-size:13px}
+    /* right column: details */
+    .detail-wrapper{display:flex; flex-direction:column; gap:14px}
+    .detail-card{background:linear-gradient(180deg,#07243a,#051526); border-radius:var(--radius); padding:20px; min-height:300px}
+    .specs{display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; margin-top:12px}
+    .spec{background:rgba(255,255,255,0.02); padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,0.02)}
+    .spec h4{margin:0 0 6px 0; font-size:13px}
+    .empty{color:var(--muted); text-align:center; padding:40px 20px; border-radius:10px; background:rgba(0,0,0,0.12)}
+    /* responsive */
+    @media (max-width:880px){
+      .app{grid-template-columns: 1fr; padding:12px}
+      header{flex-direction:column; align-items:flex-start}
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1 id="title"></h1>
-    <div class="controls">
-      <input id="search" type="search" />
-      <select id="filter"></select>
-      <select id="lang">
-        <option value="fa">فارسی</option>
-        <option value="en">English</option>
-      </select>
-    </div>
-  </header>
-  <main>
-    <aside class="sidebar" id="packageList"></aside>
-    <section class="content">
-      <div id="details" class="empty"></div>
-    </section>
-  </main>
+  <div class="app" id="app">
+    <header>
+      <h1>نمایش مشخصات پکیج‌ها</h1>
+      <div class="controls">
+        <input id="search" type="search" placeholder="جستجوی نام یا ویژگی..." />
+        <select id="filter">
+          <option value="all">همه دسته‌ها</option>
+          <option value="basic">پایه</option>
+          <option value="pro">پیشرفته</option>
+          <option value="enterprise">سازمانی</option>
+        </select>
+      </div>
+    </header>
 
-<script>
-// متن‌ها برای هر زبان
-const texts = {
-  fa: {
-    title: "نمایش مشخصات پکیج‌ها",
-    searchPlaceholder: "جستجوی نام یا ویژگی...",
-    categories: { all:"همه دسته‌ها", basic:"پایه", pro:"پیشرفته", enterprise:"سازمانی" },
-    empty: "یک پکیج انتخاب کن تا مشخصات کامل نمایش داده شود.",
-    labels: { features:"ویژگی‌ها" }
-  },
-  en: {
-    title: "Package Details Viewer",
-    searchPlaceholder: "Search by name or feature...",
-    categories: { all:"All Categories", basic:"Basic", pro:"Pro", enterprise:"Enterprise" },
-    empty: "Select a package to see details.",
-    labels: { features:"Features" }
-  }
-};
+    <!-- left: list of packages -->
+    <aside class="panel">
+      <strong>پکیج‌ها</strong>
+      <div id="list" class="list"></div>
+    </aside>
 
-// داده‌های پکیج‌ها (دو زبانه)
-const packages = [
-  {
-    id:1, category:"basic",
-    fa:{ name:"پکیج پایه", short:"شروع سرمایه‌گذاری کوچک", features:["سرمایه اولیه کم","ریسک پایین","پشتیبانی عمومی"] },
-    en:{ name:"Basic Package", short:"Start small investments", features:["Low initial capital","Low risk","General support"] }
-  },
-  {
-    id:2, category:"pro",
-    fa:{ name:"پکیج حرفه‌ای", short:"مناسب سرمایه‌گذاران با تجربه", features:["سود بالاتر","ریسک متوسط","پشتیبانی اختصاصی"] },
-    en:{ name:"Pro Package", short:"For experienced investors", features:["Higher returns","Moderate risk","Dedicated support"] }
-  },
-  {
-    id:3, category:"enterprise",
-    fa:{ name:"پکیج سازمانی", short:"برای کسب‌وکارها و سرمایه بزرگ", features:["مدیریت اختصاصی","تحلیل حرفه‌ای","سوددهی متنوع"] },
-    en:{ name:"Enterprise Package", short:"For businesses and large capital", features:["Dedicated management","Professional analytics","Diverse profits"] }
-  }
-];
+    <!-- right: details -->
+    <main class="detail-wrapper">
+      <div id="details" class="detail-card">
+        <div id="empty" class="empty">
+          یک پکیج انتخاب کن تا مشخصات کامل نمایش داده شود.
+        </div>
+      </div>
 
-let currentLang = localStorage.getItem("lang") || "fa";
-let selectedCategory = "all";
-let searchQuery = "";
+      <div class="panel">
+        <strong>مقایسه مختصر</strong>
+        <div id="summary" style="margin-top:10px;color:var(--muted);">برای مقایسه، حداقل دو پکیج را انتخاب کن.</div>
+      </div>
+    </main>
+  </div>
 
-// اعمال زبان
-function applyLanguage(lang){
-  currentLang = lang;
-  localStorage.setItem("lang", lang);
-  document.getElementById("title").textContent = texts[lang].title;
-  document.getElementById("search").placeholder = texts[lang].searchPlaceholder;
+  <script>
+    /***** نمونه داده‌ها — اینجا می‌تونی اضافه/ویرایش کنی یا بعداً از API بارگذاری کنی *****/
+    const packages = [
+      {
+        id: "pkg-basic-1",
+        name: "پکیج پایه",
+        category: "basic",
+        price: "رایگان",
+        short: "مناسب برای تست و پروژه‌های شخصی",
+        features: {
+          فضای_ذخیره: "1 گیگابایت",
+          پشتیبانی: "ایمیل (48 ساعت)",
+          کاربران: "حداکثر 1",
+          دامنه_سفارشی: "ندارد",
+          گزارشات: "محدود"
+        }
+      },
+      {
+        id: "pkg-pro-1",
+        name: "پکیج پیشرفته",
+        category: "pro",
+        price: "ماهانه 49 دلار",
+        short: "مناسب استارتاپ‌ها و تیم‌های کوچک",
+        features: {
+          فضای_ذخیره: "50 گیگابایت",
+          پشتیبانی: "ایمیل و چت (20/7)",
+          کاربران: "تا 10 کاربر",
+          دامنه_سفارشی: "دارد",
+          گزارشات: "پیشرفته"
+        }
+      },
+      {
+        id: "pkg-enterprise-1",
+        name: "پکیج سازمانی",
+        category: "enterprise",
+        price: "قیمت قراردادی",
+        short: "سفارشی‌سازی و SLA برای سازمان‌ها",
+        features: {
+          فضای_ذخیره: "نامحدود (قابل مذاکره)",
+          پشتیبانی: "پشتیبانی اختصاصی 24/7",
+          کاربران: "نامحدود",
+          دامنه_سفارشی: "دارد",
+          گزارشات: "پیشرفته + تحلیل سفارشی"
+        }
+      },
+      {
+        id: "pkg-pro-2",
+        name: "پکیج رشد",
+        category: "pro",
+        price: "ماهانه 99 دلار",
+        short: "برای تیم‌هایی که رشد سریع دارند",
+        features: {
+          فضای_ذخیره: "200 گیگابایت",
+          پشتیبانی: "چت و تماس اختصاصی",
+          کاربران: "تا 25 کاربر",
+          دامنه_سفارشی: "دارد",
+          گزارشات: "پیشرفته + API"
+        }
+      }
+    ];
 
-  const filter = document.getElementById("filter");
-  filter.innerHTML = `
-    <option value="all">${texts[lang].categories.all}</option>
-    <option value="basic">${texts[lang].categories.basic}</option>
-    <option value="pro">${texts[lang].categories.pro}</option>
-    <option value="enterprise">${texts[lang].categories.enterprise}</option>
-  `;
+    // state
+    let selected = null;
+    const listEl = document.getElementById('list');
+    const detailsEl = document.getElementById('details');
+    const emptyEl = document.getElementById('empty');
+    const summaryEl = document.getElementById('summary');
+    const searchInput = document.getElementById('search');
+    const filterSelect = document.getElementById('filter');
 
-  document.getElementById("empty").textContent = texts[lang].empty;
-  renderList();
-  renderDetails(selectedId);
-}
+    // render list based on filter & search
+    function renderList(){
+      const q = searchInput.value.trim().toLowerCase();
+      const cat = filterSelect.value;
+      listEl.innerHTML = '';
+      const filtered = packages.filter(p => {
+        const matchesCat = (cat === 'all') ? true : (p.category === cat);
+        const matchesQ = q === '' ? true : (p.name.toLowerCase().includes(q) || (p.short || '').toLowerCase().includes(q) || Object.values(p.features).join(' ').toLowerCase().includes(q));
+        return matchesCat && matchesQ;
+      });
+      if(filtered.length === 0){
+        listEl.innerHTML = '<div class="empty" style="padding:16px">نتیجه‌ای یافت نشد.</div>';
+        return;
+      }
+      filtered.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.id = p.id;
+        card.innerHTML = `
+          <div style="width:44px; height:44px; border-radius:10px; background:linear-gradient(180deg,#072a45,#06314b); display:flex;align-items:center;justify-content:center;font-weight:700;color:#bfe1ff">
+            ${p.name.split(' ')[0].slice(0,2)}
+          </div>
+          <div class="meta">
+            <div class="title">${p.name} <span style="font-size:13px;color:var(--muted);font-weight:600"> - ${p.price}</span></div>
+            <div class="desc">${p.short}</div>
+          </div>
+          <div style="margin-inline-start:auto;display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+            <div class="badge">${p.category}</div>
+            <div style="color:var(--muted);font-size:12px">${Object.keys(p.features).length} ویژگی</div>
+          </div>
+        `;
+        card.addEventListener('click', ()=> selectPackage(p.id));
+        listEl.appendChild(card);
+      });
+    }
 
-// رندر لیست
-function renderList(){
-  const list = document.getElementById("packageList");
-  list.innerHTML = "";
-  packages
-    .filter(p => selectedCategory==="all" || p.category===selectedCategory)
-    .filter(p => p[currentLang].name.includes(searchQuery) || p[currentLang].short.includes(searchQuery))
-    .forEach(p=>{
-      const div = document.createElement("div");
-      div.className="card";
-      div.innerHTML=`<strong>${p[currentLang].name}</strong><br/><small>${p[currentLang].short}</small>`;
-      div.onclick=()=>{ selectedId=p.id; renderDetails(p.id); };
-      list.appendChild(div);
-    });
-}
+    // render details for selected package
+    function selectPackage(id){
+      const pkg = packages.find(x => x.id === id);
+      if(!pkg) return;
+      selected = pkg;
+      // build details UI
+      detailsEl.innerHTML = `
+        <div style="display:flex;gap:16px;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:18px;font-weight:800">${pkg.name}</div>
+            <div style="color:var(--muted);margin-top:6px">${pkg.short}</div>
+            <div style="margin-top:8px"><strong class="badge">${pkg.price}</strong></div>
+          </div>
+          <div style="text-align:left">
+            <button id="compareBtn" style="background:transparent;border:1px solid rgba(255,255,255,0.05);padding:8px 12px;border-radius:10px;color:var(--muted);cursor:pointer">افزودن به مقایسه</button>
+          </div>
+        </div>
+        <div class="specs" style="margin-top:16px"></div>
+      `;
+      const specsEl = detailsEl.querySelector('.specs');
+      specsEl.innerHTML = '';
+      for(const [k,v] of Object.entries(pkg.features)){
+        const s = document.createElement('div');
+        s.className = 'spec';
+        s.innerHTML = `<h4>${k.replaceAll('_',' ')}</h4><div style="color:var(--muted)">${v}</div>`;
+        specsEl.appendChild(s);
+      }
 
-// رندر جزئیات
-let selectedId = null;
-function renderDetails(id){
-  const details = document.getElementById("details");
-  if(!id){
-    details.className="empty";
-    details.textContent=texts[currentLang].empty;
-    return;
-  }
-  const pkg = packages.find(p=>p.id===id);
-  details.className="";
-  details.innerHTML=`
-    <h2>${pkg[currentLang].name}</h2>
-    <p>${pkg[currentLang].short}</p>
-    <h3>${texts[currentLang].labels.features}</h3>
-    <ul>${pkg[currentLang].features.map(f=>`<li>${f}</li>`).join("")}</ul>
-  `;
-}
+      // attach compare handler
+      document.getElementById('compareBtn').addEventListener('click', ()=> {
+        toggleCompare(pkg.id);
+      });
+    }
 
-// رویدادها
-document.getElementById("filter").addEventListener("change",e=>{
-  selectedCategory=e.target.value; renderList();
-});
-document.getElementById("search").addEventListener("input",e=>{
-  searchQuery=e.target.value; renderList();
-});
-document.getElementById("lang").addEventListener("change",e=>{
-  applyLanguage(e.target.value);
-});
+    // simple compare: keep list of selected ids in local state
+    const compareSet = new Set();
+    function toggleCompare(id){
+      if(compareSet.has(id)) compareSet.delete(id);
+      else compareSet.add(id);
+      renderSummary();
+    }
 
-// بارگذاری اولیه
-applyLanguage(currentLang);
-document.getElementById("lang").value=currentLang;
-</script>
+    function renderSummary(){
+      if(compareSet.size === 0){
+        summaryEl.textContent = 'برای مقایسه، حداقل دو پکیج را انتخاب کن.';
+        return;
+      }
+      const arr = Array.from(compareSet).map(id => packages.find(p=>p.id===id));
+      // build table-like summary
+      let html = '<div style="display:flex;gap:12px;overflow:auto">';
+      arr.forEach(p=>{
+        html += `<div style="min-width:220px;background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02)">
+          <div style="font-weight:800">${p.name}</div><div style="color:var(--muted);font-size:13px">${p.price}</div><hr style="opacity:.06;margin:8px 0">
+          <div style="font-size:13px;color:var(--muted)">${Object.entries(p.features).map(([k,v])=>`<div><strong>${k.replaceAll('_',' ')}:</strong> ${v}</div>`).join('')}</div>
+        </div>`;
+      });
+      html += '</div>';
+      summaryEl.innerHTML = html;
+    }
+
+    // init
+    renderList();
+    renderSummary();
+
+    // events
+    searchInput.addEventListener('input', ()=> renderList());
+    filterSelect.addEventListener('change', ()=> renderList());
+
+    // optional: select first by default
+    // selectPackage(packages[0].id);
+  </script>
 </body>
 </html>
