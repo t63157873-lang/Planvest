@@ -1,0 +1,126 @@
+:root {
+  --bg:#0f1724;
+  --card:#0b1220;
+  --muted:#9aa4b2;
+  --accent:#4f96ff;
+  --glass: rgba(255,255,255,0.03);
+  --radius:14px;
+  font-family: "Vazirmatn", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* پایه */
+html,body {
+  height:100%; margin:0;
+  background:linear-gradient(180deg,#071025 0%, #071b2b 100%);
+  color:#e6eef8; direction:rtl;
+}
+
+.app {
+  max-width:1100px; margin:28px auto; padding:24px;
+  display:grid; grid-template-columns: 360px 1fr; gap:20px;
+}
+
+.app-header {
+  grid-column:1/-1; display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+
+h1 { margin:0; font-size:20px }
+
+/* کنترل‌ها */
+.controls { display:flex; gap:8px; align-items:center }
+
+input[type="search"], select {
+  background:var(--glass);
+  border:1px solid rgba(255,255,255,0.04);
+  color:var(--muted);
+  padding:8px 12px;
+  border-radius:10px;
+  outline:none;
+  min-width:180px;
+}
+
+select { min-width:140px; }
+
+/* پنل‌ها */
+.panel {
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius:var(--radius); padding:14px;
+  box-shadow: 0 6px 20px rgba(2,6,23,0.6);
+}
+
+/* لیست */
+.list {
+  display:flex; flex-direction:column; gap:10px;
+  margin-top:10px; max-height:70vh; overflow:auto; padding-right:4px;
+}
+
+.card {
+  background:linear-gradient(180deg,#071428,#061322);
+  border-radius:12px; padding:12px;
+  cursor:pointer; display:flex; gap:12px; align-items:center;
+  border:1px solid rgba(255,255,255,0.03);
+  transition: all .25s ease;
+}
+.card:hover { transform:translateY(-4px); box-shadow: 0 8px 30px rgba(15,100,255,0.08) }
+
+.card-icon {
+  width:44px; height:44px; border-radius:10px;
+  background:linear-gradient(180deg,#072a45,#06314b);
+  display:flex; align-items:center; justify-content:center;
+  font-weight:700; color:#bfe1ff;
+}
+
+.card-meta {
+  margin-inline-start:auto;
+  display:flex; flex-direction:column; align-items:flex-end; gap:6px;
+}
+
+/* جزئیات */
+.detail-wrapper { display:flex; flex-direction:column; gap:14px }
+
+.detail-card {
+  background:linear-gradient(180deg,#07243a,#051526);
+  border-radius:var(--radius); padding:20px; min-height:300px;
+}
+
+.specs { display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; margin-top:12px }
+
+.spec {
+  background:rgba(255,255,255,0.02); padding:10px;
+  border-radius:10px; border:1px solid rgba(255,255,255,0.02);
+}
+.spec h4 { margin:0 0 6px 0; font-size:13px }
+
+.empty {
+  color:var(--muted); text-align:center;
+  padding:40px 20px; border-radius:10px;
+  background:rgba(0,0,0,0.12);
+}
+
+/* دکمه‌ها */
+.btn-primary {
+  background:var(--accent); color:#fff;
+  border:none; padding:10px 18px;
+  border-radius:10px; cursor:pointer; font-weight:600;
+  transition:background .2s ease;
+}
+.btn-primary:hover { background:#3d7fe0; }
+
+/* برچسب */
+.badge {
+  background:linear-gradient(90deg,var(--accent),#7fc0ff);
+  color:#02233b; font-weight:600;
+  padding:6px 10px; border-radius:999px; font-size:13px;
+}
+
+/* خلاصه مقایسه */
+.summary-placeholder { margin-top:10px; color:var(--muted) }
+
+/* فوتر */
+.footer { text-align:center; color:var(--muted); grid-column:1/-1; margin-top:20px }
+
+/* واکنش‌گرا */
+@media (max-width:880px){
+  .app{grid-template-columns: 1fr; padding:12px}
+  .app-header{flex-direction:column; align-items:flex-start}
+}
