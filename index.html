@@ -4,11 +4,123 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>پکیج‌ها — نمایش مشخصات</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    :root {
+      --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#4f96ff; --glass: rgba(255,255,255,0.05);
+      --radius:14px; --text:#e6eef8;
+    }
+    body.light {
+      --bg:#f9fafb; --card:#fff; --muted:#6b7280; --accent:#2563eb; --glass: rgba(0,0,0,0.05); --text:#111827;
+    }
+    html,body {
+      margin:0; height:100%;
+      background:var(--bg); color:var(--text); direction:rtl;
+      font-family:"Vazirmatn",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+      transition: background .3s ease, color .3s ease;
+    }
+
+    .app {
+      max-width:1100px; margin:28px auto; padding:24px;
+      display:grid; grid-template-columns:360px 1fr; gap:20px;
+    }
+    header {
+      grid-column:1/-1; display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    h1 { margin:0; font-size:22px }
+    .controls { display:flex; gap:8px; align-items:center }
+    input[type="search"], select {
+      background:var(--glass); border:1px solid rgba(0,0,0,0.1);
+      padding:8px 12px; border-radius:10px;
+      outline:none; min-width:180px; color:var(--muted);
+      transition:.2s ease;
+    }
+    input[type="search"]:focus, select:focus { border-color:var(--accent); color:var(--text) }
+
+    /* پنل */
+    .panel {
+      background:var(--card); border-radius:var(--radius); padding:14px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.2); transition:.3s ease;
+    }
+
+    /* لیست */
+    .list {
+      display:flex; flex-direction:column; gap:10px;
+      margin-top:10px; max-height:70vh; overflow:auto;
+      padding-right:4px;
+    }
+    .card {
+      background:var(--card); border-radius:12px; padding:12px;
+      cursor:pointer; display:flex; gap:12px; align-items:center;
+      border:1px solid rgba(0,0,0,0.05); transition:all .25s ease;
+    }
+    .card:hover { transform:translateY(-4px) scale(1.02); box-shadow:0 8px 24px rgba(79,150,255,0.3) }
+    .card-icon {
+      width:44px; height:44px; border-radius:10px;
+      background:linear-gradient(180deg,#2563eb,#1e3a8a);
+      display:flex; align-items:center; justify-content:center;
+      font-weight:700; color:#fff;
+    }
+    .card-meta { margin-inline-start:auto; display:flex; flex-direction:column; align-items:flex-end; gap:6px }
+
+    /* جزئیات */
+    .detail-wrapper { display:flex; flex-direction:column; gap:14px }
+    .detail-card {
+      background:var(--card); border-radius:var(--radius);
+      padding:20px; min-height:300px;
+      box-shadow:0 4px 16px rgba(0,0,0,0.15);
+    }
+    .specs { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:16px }
+    .spec {
+      background:var(--glass); padding:10px;
+      border-radius:10px; border:1px solid rgba(0,0,0,0.05);
+    }
+    .spec h4 { margin:0 0 6px 0; font-size:13px }
+
+    .empty {
+      color:var(--muted); text-align:center;
+      padding:40px 20px; border-radius:10px;
+      background:var(--glass);
+    }
+
+    /* برچسب */
+    .badge {
+      background:linear-gradient(90deg,var(--accent),#7fc0ff);
+      color:#fff; font-weight:600; padding:6px 10px;
+      border-radius:999px; font-size:13px;
+    }
+
+    /* دکمه‌ها */
+    .btn-primary {
+      background:var(--accent); color:#fff;
+      border:none; padding:10px 18px; border-radius:10px;
+      cursor:pointer; font-weight:600; transition:.2s ease;
+    }
+    .btn-primary:hover { opacity:.9; }
+    .btn-secondary {
+      background:transparent; border:1px solid var(--muted);
+      padding:8px 12px; border-radius:10px; color:var(--muted); cursor:pointer;
+      transition:.2s ease;
+    }
+    .btn-secondary:hover { border-color:var(--accent); color:var(--accent) }
+
+    footer { text-align:center; color:var(--muted); grid-column:1/-1; margin-top:20px }
+
+    /* ریسپانسیو */
+    @media(max-width:880px) {
+      .app { grid-template-columns:1fr; padding:12px }
+      header { flex-direction:column; align-items:flex-start }
+    }
+
+    /* دکمه مود */
+    .theme-toggle {
+      cursor:pointer; border:none; background:var(--glass);
+      padding:6px 10px; border-radius:8px; color:var(--muted);
+    }
+  </style>
 </head>
 <body>
   <div class="app" id="app">
-    <header class="app-header">
+    <header>
       <h1>نمایش مشخصات پکیج‌ها</h1>
       <div class="controls">
         <input id="search" type="search" placeholder="جستجوی نام یا ویژگی..." />
@@ -18,10 +130,11 @@
           <option value="pro">پیشرفته</option>
           <option value="enterprise">سازمانی</option>
         </select>
+        <button id="themeBtn" class="theme-toggle">🌓</button>
       </div>
     </header>
 
-    <!-- لیست پکیج‌ها -->
+    <!-- لیست -->
     <aside class="panel">
       <strong>پکیج‌ها</strong>
       <div id="list" class="list"></div>
@@ -30,26 +143,36 @@
     <!-- جزئیات -->
     <main class="detail-wrapper">
       <div id="details" class="detail-card">
-        <div id="empty" class="empty">
-          یک پکیج انتخاب کن تا مشخصات کامل نمایش داده شود.
-        </div>
+        <div id="empty" class="empty">یک پکیج انتخاب کن تا مشخصات کامل نمایش داده شود.</div>
       </div>
 
       <div class="panel">
         <strong>مقایسه مختصر</strong>
-        <div id="summary" class="summary-placeholder">
-          برای مقایسه، حداقل دو پکیج را انتخاب کن.
-        </div>
+        <div id="summary" style="margin-top:10px;color:var(--muted)">برای مقایسه، حداقل دو پکیج را انتخاب کن.</div>
       </div>
     </main>
 
-    <!-- فوتر -->
-    <footer class="footer">
+    <footer>
       <p>بعد از انتخاب پکیج مورد نظر، روی دکمه زیر بزنید تا مشخصات به ایمیل ارسال شود:</p>
       <button id="sendEmailBtn" class="btn-primary">ارسال به ایمیل</button>
     </footer>
   </div>
 
-  <script src="js/app.js"></script>
-</body>
-</html>
+  <script>
+    const packages = [
+      {id:"pkg-basic-1",name:"پکیج برنز",category:"basic",price:"68$",short:"مناسب برای تست و سرمایه گذاری های شخصی",features:{فضای_کاربر:"1",پشتیبانی:"ایمیل (24 ساعت)",کاربران:"حداکثر 2",دامنه_سفارشی:"ندارد",گزارشات:"محدود"}},
+      {id:"pkg-pro-1",name:"پکیج نقره ای",category:"pro",price:"112$",short:"مناسب استارتاپ‌ها و تیم‌های کوچک",features:{فضای_کاربر:"1",پشتیبانی:"ایمیل (24/7)",کاربران:"تا 5 کاربر",دامنه_سفارشی:"ندارد",گزارشات:"پیشرفته"}},
+      {id:"pkg-enterprise-1",name:"پکیج طلایی",category:"enterprise",price:"1050$",short:"سفارشی‌سازی برای سازمان ها",features:{فضای_کاربر:"1",پشتیبانی:"ایمیل 24/7",کاربران:"50",دامنه_سفارشی:"ندارد",گزارشات:"پیشرفته"}},
+      {id:"pkg-pro-2",name:"پکیج الماس",category:"pro",price:"10000$",short:"برای تیم‌های بزرگ",features:{فضای_کاربر:"1",پشتیبانی:"چت و تماس اختصاصی",کاربران:"تا 500 کاربر",دامنه_سفارشی:"ندارد",گزارشات:"پیشرفته + API"}}
+    ];
+
+    let selected=null; const listEl=document.getElementById('list'); const detailsEl=document.getElementById('details');
+    const summaryEl=document.getElementById('summary'); const searchInput=document.getElementById('search');
+    const filterSelect=document.getElementById('filter'); const compareSet=new Set();
+
+    function renderList(){
+      const q=searchInput.value.trim().toLowerCase(); const cat=filterSelect.value;
+      listEl.innerHTML='';
+      const filtered=packages.filter(p=>{
+        const matchesCat=(cat==='all')?true:(p.category===cat);
+        const matchesQ=q===''?true: p.name.toLowerCase().includes(q)||p.short.toLowerCase().includes(q)||Object.values(p.features).join(' ').toLowerCase().includes
