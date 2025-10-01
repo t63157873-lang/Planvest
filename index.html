@@ -1,143 +1,156 @@
 <!doctype html>
 <html lang="fa">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>پکیج‌ها — سفارش</title>
-<style>
-:root {
-  --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#4f96ff; --glass: rgba(255,255,255,0.05);
-  --radius:14px; --text:#e6eef8;
-}
-body { margin:0; font-family:"Vazirmatn",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial; background:var(--bg); color:var(--text); direction:rtl; }
-.container { max-width:1100px; margin:30px auto; padding:20px; }
-h1 { text-align:center; margin-bottom:30px; font-size:26px; }
-.cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; }
-.card { background:var(--card); padding:20px; border-radius:var(--radius); box-shadow:0 6px 18px rgba(0,0,0,0.3); transition:.25s; display:flex; flex-direction:column; gap:12px; }
-.card:hover { transform:translateY(-4px) scale(1.02); box-shadow:0 10px 30px rgba(79,150,255,0.4); }
-.card h2 { margin:0; font-size:20px; }
-.card .price { font-weight:800; color:var(--accent); font-size:18px; }
-.card ul { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:6px; }
-.card button { margin-top:auto; padding:10px 18px; border:none; border-radius:10px; background:var(--accent); color:#fff; cursor:pointer; font-weight:600; transition:.2s; }
-.card button:hover { opacity:.9; }
-
-#app-section { margin-top:50px; padding:30px; background:var(--card); border-radius:var(--radius); text-align:center; font-size:20px; box-shadow:0 6px 18px rgba(0,0,0,0.3); }
-
-.modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:1000; }
-.modal { background:var(--card); padding:25px; border-radius:var(--radius); max-width:400px; width:90%; display:flex; flex-direction:column; gap:12px; }
-.modal input { padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); outline:none; width:100%; }
-.modal button { padding:10px; border:none; border-radius:10px; background:var(--accent); color:#fff; cursor:pointer; font-weight:600; transition:.2s; }
-.modal button:hover { opacity:.9; }
-.modal .close-btn { background:transparent; border:none; color:var(--muted); font-size:18px; position:absolute; top:10px; left:10px; cursor:pointer; }
-
-@media(max-width:600px){ .cards { grid-template-columns:1fr; } }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>پکیج‌ها — سفارش امن</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa4b2;--accent:#4f96ff;--radius:12px;--text:#e6eef8}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:"Vazirmatn",system-ui;direction:rtl}
+    .wrap{max-width:1100px;margin:28px auto;padding:20px}
+    h1{text-align:center}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+    .card{background:var(--card);padding:18px;border-radius:var(--radius);box-shadow:0 6px 18px rgba(0,0,0,0.4);display:flex;flex-direction:column}
+    .card h2{margin:0 0 8px}
+    .price{color:var(--accent);font-weight:800;margin-bottom:8px}
+    ul{margin:0 0 12px;padding:0;list-style:none}
+    li{color:var(--muted);margin-bottom:6px}
+    button{background:var(--accent);border:none;color:#fff;padding:10px;border-radius:10px;cursor:pointer;font-weight:600}
+    .app-note{margin-top:26px;background:var(--card);padding:20px;border-radius:var(--radius);text-align:center}
+    /* modal */
+    .modal-wrap{display:none;position:fixed;inset:0;justify-content:center;align-items:center;background:rgba(0,0,0,0.7);z-index:999}
+    .modal{background:var(--card);padding:20px;border-radius:12px;width:96%;max-width:420px;position:relative}
+    .modal h3{margin:0 0 12px}
+    .modal input{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);margin-bottom:10px}
+    .modal .small{font-size:13px;color:var(--muted)}
+    .close-x{position:absolute;left:12px;top:8px;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer}
+    .success{background:linear-gradient(90deg,#16a34a,#60a5fa);padding:12px;border-radius:10px;color:#022; font-weight:700; text-align:center}
+    @media(max-width:600px){ .cards{grid-template-columns:1fr} }
+  </style>
 </head>
 <body>
+  <div class="wrap">
+    <h1>پکیج‌های سرمایه‌گذاری</h1>
+    <div class="cards">
+      <div class="card" data-package="Bronze">
+        <h2>Bronze</h2>
+        <div class="price">68$</div>
+        <ul>
+          <li>سود روزانه: 5%</li>
+          <li>تعداد زیرمجموعه: 2 نفر</li>
+          <li>سود هر زیرمجموعه: 2.5%</li>
+          <li>برداشت سود: هر 10 روز یکبار</li>
+          <li>پشتیبانی: هر 24 ساعت یکبار</li>
+        </ul>
+        <button class="order">سفارش</button>
+      </div>
 
-<div class="container">
-  <h1>پکیج‌های سرمایه‌گذاری</h1>
-  <div class="cards">
-    <div class="card" data-package="Bronze">
-      <h2>Bronze</h2>
-      <div class="price">68$</div>
-      <ul>
-        <li>سود روزانه: 5%</li>
-        <li>تعداد زیرمجموعه: 2 نفر</li>
-        <li>سود هر زیرمجموعه: 2.5%</li>
-        <li>برداشت سود: هر 10 روز یکبار</li>
-        <li>پشتیبانی: هر 24 ساعت یکبار</li>
-      </ul>
-      <button class="order-btn">سفارش</button>
+      <div class="card" data-package="Silver">
+        <h2>Silver</h2>
+        <div class="price">112$</div>
+        <ul>
+          <li>سود روزانه: 5%</li>
+          <li>تعداد زیرمجموعه: 4 نفر</li>
+          <li>سود هر زیرمجموعه: 2.5%</li>
+          <li>برداشت سود: هر 5 روز یکبار</li>
+          <li>پشتیبانی: هر 24 ساعت دوبار</li>
+        </ul>
+        <button class="order">سفارش</button>
+      </div>
+
+      <div class="card" data-package="Gold">
+        <h2>Gold</h2>
+        <div class="price">500$</div>
+        <ul>
+          <li>سود روزانه: 5%</li>
+          <li>تعداد زیرمجموعه: 16 نفر</li>
+          <li>سود هر زیرمجموعه: 2.5%</li>
+          <li>برداشت سود: هر روز یکبار</li>
+          <li>پشتیبانی: هر 12 ساعت دوبار</li>
+        </ul>
+        <button class="order">سفارش</button>
+      </div>
     </div>
 
-    <div class="card" data-package="Silver">
-      <h2>Silver</h2>
-      <div class="price">112$</div>
-      <ul>
-        <li>سود روزانه: 5%</li>
-        <li>تعداد زیرمجموعه: 4 نفر</li>
-        <li>سود هر زیرمجموعه: 2.5%</li>
-        <li>برداشت سود: هر 5 روز یکبار</li>
-        <li>پشتیبانی: هر 24 ساعت دوبار</li>
-      </ul>
-      <button class="order-btn">سفارش</button>
-    </div>
-
-    <div class="card" data-package="Gold">
-      <h2>Gold</h2>
-      <div class="price">500$</div>
-      <ul>
-        <li>سود روزانه: 5%</li>
-        <li>تعداد زیرمجموعه: 16 نفر</li>
-        <li>سود هر زیرمجموعه: 2.5%</li>
-        <li>برداشت سود: هر روز یکبار</li>
-        <li>پشتیبانی: هر 12 ساعت دوبار</li>
-      </ul>
-      <button class="order-btn">سفارش</button>
+    <div class="app-note">
+      بخش App — <strong>به‌زودی (Coming Soon)</strong>
     </div>
   </div>
 
-  <div id="app-section">
-    بخش App — <strong>به‌زودی (Coming Soon)</strong>
-  </div>
-</div>
-
-<!-- Modal -->
-<div class="modal-bg" id="modal-bg">
-  <div class="modal">
-    <button class="close-btn" id="close-modal">&times;</button>
-    <h3 id="modal-title">سفارش پکیج</h3>
-    <input type="email" id="user-email" placeholder="ایمیل خود را وارد کنید" required />
-    <div id="contract-address" style="margin-top:10px; display:none; padding:10px; background:rgba(255,255,255,0.05); border-radius:10px; word-break:break-all;">
-      آدرس قرارداد: (بعداً اضافه می‌شود)
+  <!-- Modal -->
+  <div class="modal-wrap" id="modalWrap">
+    <div class="modal" role="dialog" aria-modal="true">
+      <button class="close-x" id="closeModal">&times;</button>
+      <h3 id="modalTitle">ثبت سفارش</h3>
+      <input id="emailInput" type="email" placeholder="ایمیل خود را وارد کنید" autocomplete="email" />
+      <div class="small">پس از ارسال، ایمیل شما فقط برای اطلاع‌رسانی و پیگیری سفارش نزد ما ذخیره می‌شود و به شخص ثالثی داده نخواهد شد.</div>
+      <div style="height:10px"></div>
+      <button id="submitOrder">تأیید و ارسال سفارش</button>
+      <div id="modalMessage" style="margin-top:12px"></div>
     </div>
-    <p id="payment-note" style="margin-top:10px; display:none; color:var(--accent); font-weight:600;">
-      لطفاً مبلغ دقیق را پرداخت کنید!
-    </p>
-    <button id="confirm-btn">تایید</button>
   </div>
-</div>
 
 <script>
-const orderButtons = document.querySelectorAll('.order-btn');
-const modalBg = document.getElementById('modal-bg');
-const closeModal = document.getElementById('close-modal');
-const modalTitle = document.getElementById('modal-title');
-const contractDiv = document.getElementById('contract-address');
-const paymentNote = document.getElementById('payment-note');
-const confirmBtn = document.getElementById('confirm-btn');
-const userEmail = document.getElementById('user-email');
-let selectedPackage = '';
+  const orderBtns = document.querySelectorAll('.order');
+  const modalWrap = document.getElementById('modalWrap');
+  const closeModal = document.getElementById('closeModal');
+  const modalTitle = document.getElementById('modalTitle');
+  const emailInput = document.getElementById('emailInput');
+  const submitOrder = document.getElementById('submitOrder');
+  const modalMessage = document.getElementById('modalMessage');
+  let currentPackage = '';
 
-orderButtons.forEach(btn => {
-  btn.addEventListener('click', () => {
-    selectedPackage = btn.closest('.card').dataset.package;
-    modalTitle.textContent = `سفارش پکیج ${selectedPackage}`;
-    modalBg.style.display = 'flex';
-    contractDiv.style.display = 'none';
-    paymentNote.style.display = 'none';
-    userEmail.value = '';
+  orderBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const card = e.target.closest('.card');
+      currentPackage = card.dataset.package;
+      modalTitle.textContent = `سفارش پکیج ${currentPackage}`;
+      emailInput.value = '';
+      modalMessage.innerHTML = '';
+      modalWrap.style.display = 'flex';
+    });
   });
-});
 
-closeModal.addEventListener('click', () => {
-  modalBg.style.display = 'none';
-});
+  closeModal.addEventListener('click', () => modalWrap.style.display = 'none');
 
-confirmBtn.addEventListener('click', () => {
-  const email = userEmail.value.trim();
-  if(!email) { alert("لطفاً ایمیل خود را وارد کنید."); return; }
-  // نمایش آدرس قرارداد و یادآوری پرداخت دقیق
-  contractDiv.style.display = 'block';
-  paymentNote.style.display = 'block';
-  // ارسال ایمیل به خودت (mailto)
-  const subject = `سفارش پکیج ${selectedPackage}`;
-  const body = `کاربر سفارش داده:\n\nپکیج: ${selectedPackage}\nایمیل: ${email}\n\nلطفاً پس از پرداخت با این ایمیل ارتباط برقرار کنید.`;
-  const yourEmail = "planvestfirst@gmail.com";
-  window.location.href = `mailto:${yourEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-});
+  submitOrder.addEventListener('click', async () => {
+    const email = emailInput.value.trim();
+    if (!email) {
+      modalMessage.innerHTML = '<div style="color:#ffcccb">لطفاً ایمیل معتبر وارد کنید.</div>';
+      return;
+    }
+    // درخواست ارسال به سرور
+    submitOrder.disabled = true;
+    submitOrder.textContent = 'در حال ارسال...';
+
+    try {
+      const resp = await fetch('/api/order', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ package: currentPackage, email })
+      });
+      const data = await resp.json();
+      if (!data.ok) {
+        modalMessage.innerHTML = `<div style="color:#ffcccb">${data.error || 'خطا در ارسال'}</div>`;
+      } else {
+        modalMessage.innerHTML = `<div class="success">سفارش شما ثبت شد. ما به زودی از طریق ایمیل با شما تماس می‌گیریم.</div>
+          <div style="margin-top:8px;font-size:13px;color:#bde0ff">آدرس قرارداد و اطلاعات پرداخت امن برای شما بعد از ثبت سفارش ارسال خواهد شد.</div>`;
+        // در اینجا ما آدرس قرارداد را به کاربر نشان نمیدهیم تا از فاش شدن جلوگیری شود
+        // اگر می‌خواهی آدرس قرارداد در همینجا نمایش داده شود، باید سرور آن را در پاسخ قرار دهد.
+      }
+    } catch (err) {
+      console.error(err);
+      modalMessage.innerHTML = '<div style="color:#ffcccb">خطا در اتصال به سرور. لطفاً بعداً تلاش کنید.</div>';
+    } finally {
+      submitOrder.disabled = false;
+      submitOrder.textContent = 'تأیید و ارسال سفارش';
+    }
+  });
+
+  // کلیک بیرون modal → بستن
+  modalWrap.addEventListener('click', (e) => {
+    if (e.target === modalWrap) modalWrap.style.display = 'none';
+  });
 </script>
-
 </body>
 </html>
