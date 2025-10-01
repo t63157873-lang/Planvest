@@ -1,156 +1,293 @@
 <!doctype html>
 <html lang="fa">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>پکیج‌ها — سفارش امن</title>
-  <style>
-    :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa4b2;--accent:#4f96ff;--radius:12px;--text:#e6eef8}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:"Vazirmatn",system-ui;direction:rtl}
-    .wrap{max-width:1100px;margin:28px auto;padding:20px}
-    h1{text-align:center}
-    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
-    .card{background:var(--card);padding:18px;border-radius:var(--radius);box-shadow:0 6px 18px rgba(0,0,0,0.4);display:flex;flex-direction:column}
-    .card h2{margin:0 0 8px}
-    .price{color:var(--accent);font-weight:800;margin-bottom:8px}
-    ul{margin:0 0 12px;padding:0;list-style:none}
-    li{color:var(--muted);margin-bottom:6px}
-    button{background:var(--accent);border:none;color:#fff;padding:10px;border-radius:10px;cursor:pointer;font-weight:600}
-    .app-note{margin-top:26px;background:var(--card);padding:20px;border-radius:var(--radius);text-align:center}
-    /* modal */
-    .modal-wrap{display:none;position:fixed;inset:0;justify-content:center;align-items:center;background:rgba(0,0,0,0.7);z-index:999}
-    .modal{background:var(--card);padding:20px;border-radius:12px;width:96%;max-width:420px;position:relative}
-    .modal h3{margin:0 0 12px}
-    .modal input{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);margin-bottom:10px}
-    .modal .small{font-size:13px;color:var(--muted)}
-    .close-x{position:absolute;left:12px;top:8px;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer}
-    .success{background:linear-gradient(90deg,#16a34a,#60a5fa);padding:12px;border-radius:10px;color:#022; font-weight:700; text-align:center}
-    @media(max-width:600px){ .cards{grid-template-columns:1fr} }
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>پکیج‌ها — پرداخت و ارسال رسید (BSC)</title>
+<style>
+  :root{
+    --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#4f96ff; --radius:12px; --text:#e6eef8;
+  }
+  body{margin:0;background:var(--bg);color:var(--text);font-family:"Vazirmatn",system-ui;direction:rtl}
+  .wrap{max-width:1100px;margin:30px auto;padding:20px}
+  h1{text-align:center;margin-bottom:18px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+  .card{background:var(--card);padding:16px;border-radius:var(--radius);box-shadow:0 6px 18px rgba(0,0,0,0.4);display:flex;flex-direction:column;gap:8px}
+  .card h2{margin:0 0 6px}
+  .price{color:var(--accent);font-weight:800}
+  ul{margin:0;padding:0;list-style:none;color:var(--muted)}
+  button{background:var(--accent);border:none;color:#fff;padding:10px;border-radius:10px;cursor:pointer;font-weight:600}
+  .app-note{margin-top:24px;background:var(--card);padding:18px;border-radius:10px;text-align:center;color:var(--muted)}
+  /* modal */
+  .modal-wrap{display:none;position:fixed;inset:0;justify-content:center;align-items:center;background:rgba(0,0,0,0.7);z-index:999}
+  .modal{background:var(--card);padding:18px;border-radius:12px;width:94%;max-width:520px;position:relative;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+  .modal h3{margin:0 0 10px}
+  .modal input[type="email"]{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);margin-bottom:10px;background:transparent;color:var(--text)}
+  .close-x{position:absolute;left:12px;top:8px;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer}
+  .wallet-box{background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;border:1px dashed rgba(255,255,255,0.03);word-break:break-all;display:flex;align-items:center;gap:10px}
+  .network-badge{background:#f3d36b;color:#1b1b1b;padding:6px 8px;border-radius:999px;font-weight:700;font-size:13px}
+  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:8px;border-radius:8px;cursor:pointer}
+  .note{font-size:13px;color:var(--muted);margin-top:8px}
+  .copied{color:#b6ffb3;font-weight:700}
+  .success{background:linear-gradient(90deg,#16a34a,#60a5fa);padding:12px;border-radius:10px;color:#022; font-weight:700; text-align:center}
+  @media(max-width:600px){ .cards{grid-template-columns:1fr} }
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>پکیج‌های سرمایه‌گذاری</h1>
-    <div class="cards">
-      <div class="card" data-package="Bronze">
-        <h2>Bronze</h2>
-        <div class="price">68$</div>
-        <ul>
-          <li>سود روزانه: 5%</li>
-          <li>تعداد زیرمجموعه: 2 نفر</li>
-          <li>سود هر زیرمجموعه: 2.5%</li>
-          <li>برداشت سود: هر 10 روز یکبار</li>
-          <li>پشتیبانی: هر 24 ساعت یکبار</li>
-        </ul>
-        <button class="order">سفارش</button>
-      </div>
 
-      <div class="card" data-package="Silver">
-        <h2>Silver</h2>
-        <div class="price">112$</div>
-        <ul>
-          <li>سود روزانه: 5%</li>
-          <li>تعداد زیرمجموعه: 4 نفر</li>
-          <li>سود هر زیرمجموعه: 2.5%</li>
-          <li>برداشت سود: هر 5 روز یکبار</li>
-          <li>پشتیبانی: هر 24 ساعت دوبار</li>
-        </ul>
-        <button class="order">سفارش</button>
-      </div>
+<div class="wrap">
+  <h1>پکیج‌های سرمایه‌گذاری</h1>
 
-      <div class="card" data-package="Gold">
-        <h2>Gold</h2>
-        <div class="price">500$</div>
-        <ul>
-          <li>سود روزانه: 5%</li>
-          <li>تعداد زیرمجموعه: 16 نفر</li>
-          <li>سود هر زیرمجموعه: 2.5%</li>
-          <li>برداشت سود: هر روز یکبار</li>
-          <li>پشتیبانی: هر 12 ساعت دوبار</li>
-        </ul>
-        <button class="order">سفارش</button>
-      </div>
+  <div class="cards">
+    <div class="card" data-package="Bronze" data-amount="68$">
+      <h2>Bronze</h2>
+      <div class="price">68$</div>
+      <ul>
+        <li>سود روزانه: 5%</li>
+        <li>تعداد زیرمجموعه: 2 نفر</li>
+        <li>سود هر زیرمجموعه: 2.5%</li>
+        <li>برداشت سود: هر 10 روز یکبار</li>
+        <li>پشتیبانی: هر 24 ساعت یکبار</li>
+      </ul>
+      <button class="pay-btn">پرداخت</button>
     </div>
 
-    <div class="app-note">
-      بخش App — <strong>به‌زودی (Coming Soon)</strong>
+    <div class="card" data-package="Silver" data-amount="112$">
+      <h2>Silver</h2>
+      <div class="price">112$</div>
+      <ul>
+        <li>سود روزانه: 5%</li>
+        <li>تعداد زیرمجموعه: 4 نفر</li>
+        <li>سود هر زیرمجموعه: 2.5%</li>
+        <li>برداشت سود: هر 5 روز یکبار</li>
+        <li>پشتیبانی: هر 24 ساعت دوبار</li>
+      </ul>
+      <button class="pay-btn">پرداخت</button>
+    </div>
+
+    <div class="card" data-package="Gold" data-amount="500$">
+      <h2>Gold</h2>
+      <div class="price">500$</div>
+      <ul>
+        <li>سود روزانه: 5%</li>
+        <li>تعداد زیرمجموعه: 16 نفر</li>
+        <li>سود هر زیرمجموعه: 2.5%</li>
+        <li>برداشت سود: هر روز یکبار</li>
+        <li>پشتیبانی: هر 12 ساعت دوبار</li>
+      </ul>
+      <button class="pay-btn">پرداخت</button>
     </div>
   </div>
 
-  <!-- Modal -->
-  <div class="modal-wrap" id="modalWrap">
-    <div class="modal" role="dialog" aria-modal="true">
-      <button class="close-x" id="closeModal">&times;</button>
-      <h3 id="modalTitle">ثبت سفارش</h3>
-      <input id="emailInput" type="email" placeholder="ایمیل خود را وارد کنید" autocomplete="email" />
-      <div class="small">پس از ارسال، ایمیل شما فقط برای اطلاع‌رسانی و پیگیری سفارش نزد ما ذخیره می‌شود و به شخص ثالثی داده نخواهد شد.</div>
-      <div style="height:10px"></div>
-      <button id="submitOrder">تأیید و ارسال سفارش</button>
-      <div id="modalMessage" style="margin-top:12px"></div>
-    </div>
+  <div class="app-note">
+    بخش App — <strong>به‌زودی (Coming Soon)</strong>
   </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-wrap" id="modalWrap" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true">
+    <button class="close-x" id="closeModal">&times;</button>
+    <h3 id="modalTitle">پرداخت</h3>
+
+    <!-- مرحله 1: گرفتن ایمیل -->
+    <div id="step-email">
+      <label class="note">لطفاً ایمیل خود را وارد کنید (برای پیگیری سفارش)</label>
+      <input id="emailInput" type="email" placeholder="ایمیل شما" autocomplete="email" />
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="continueBtn">ادامه</button>
+        <button id="cancelBtn" class="btn-ghost">لغو</button>
+      </div>
+      <div id="emailError" class="note" style="color:#ffb3b3;margin-top:8px;display:none"></div>
+    </div>
+
+    <!-- مرحله 2: نمایش آدرس کیف پول و یادآوری مبلغ -->
+    <div id="step-wallet" style="display:none">
+      <div class="note" id="payNote">لطفاً مبلغ دقیق را پرداخت کنید. بعد از پرداخت روی «پرداخت کردم» کلیک کنید و سپس رسید (اسکرین‌شات) را به ایمیل ما ارسال کنید.</div>
+
+      <div style="margin-top:12px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div class="network-badge">BSC</div>
+          <div class="note">شبکه: <strong>Binance Smart Chain (BSC)</strong></div>
+        </div>
+
+        <div class="note">آدرس کیف پول (کپی کن و در ولت پیست کن):</div>
+        <div class="wallet-box" id="walletAddress">0x5fc83bd9a3f07cac70d98a5302985999ec513b47</div>
+
+        <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+          <button id="copyAddr" class="btn-ghost">کپی آدرس</button>
+          <button id="openWallet" class="btn-ghost">باز کردن در BscScan</button>
+          <div id="copiedMsg" style="margin-left:auto;font-size:13px;color:var(--muted)"></div>
+        </div>
+
+        <div style="height:8px"></div>
+        <div class="note">مبلغ دقیق پرداختی: <strong id="payAmount"></strong></div>
+
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button id="paidBtn">پرداخت کردم</button>
+          <button id="backToEmail" class="btn-ghost">بازگشت</button>
+        </div>
+
+        <div id="paidMsg" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <script>
-  const orderBtns = document.querySelectorAll('.order');
-  const modalWrap = document.getElementById('modalWrap');
-  const closeModal = document.getElementById('closeModal');
-  const modalTitle = document.getElementById('modalTitle');
-  const emailInput = document.getElementById('emailInput');
-  const submitOrder = document.getElementById('submitOrder');
-  const modalMessage = document.getElementById('modalMessage');
-  let currentPackage = '';
+/* ==== تنظیمات اولیه: (آدرس کیف پول و ایمیل گیرنده همینجا تنظیم شده) ==== */
+const WALLET_ADDRESS = '0x5fc83bd9a3f07cac70d98a5302985999ec513b47';
+const WALLET_EXPLORER_PREFIX = 'https://bscscan.com/address/';
+const OWNER_EMAIL = 'planvestfirst@gmail.com';
+/* ================================================================== */
 
-  orderBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const card = e.target.closest('.card');
-      currentPackage = card.dataset.package;
-      modalTitle.textContent = `سفارش پکیج ${currentPackage}`;
-      emailInput.value = '';
-      modalMessage.innerHTML = '';
-      modalWrap.style.display = 'flex';
-    });
+const payButtons = document.querySelectorAll('.pay-btn');
+const modalWrap = document.getElementById('modalWrap');
+const closeModal = document.getElementById('closeModal');
+const modalTitle = document.getElementById('modalTitle');
+
+const stepEmail = document.getElementById('step-email');
+const emailInput = document.getElementById('emailInput');
+const continueBtn = document.getElementById('continueBtn');
+const cancelBtn = document.getElementById('cancelBtn');
+const emailError = document.getElementById('emailError');
+
+const stepWallet = document.getElementById('step-wallet');
+const walletAddressEl = document.getElementById('walletAddress');
+const copyAddrBtn = document.getElementById('copyAddr');
+const openWalletBtn = document.getElementById('openWallet');
+const payAmountEl = document.getElementById('payAmount');
+const paidBtn = document.getElementById('paidBtn');
+const backToEmailBtn = document.getElementById('backToEmail');
+const paidMsg = document.getElementById('paidMsg');
+const copiedMsg = document.getElementById('copiedMsg');
+
+let currentPackage = '';
+let currentAmount = '';
+let currentEmail = '';
+
+/* باز کردن modal و تنظیم بسته */
+payButtons.forEach(btn=>{
+  btn.addEventListener('click', (e)=>{
+    const card = e.target.closest('.card');
+    currentPackage = card.dataset.package;
+    currentAmount = card.dataset.amount;
+    modalTitle.textContent = `پرداخت — ${currentPackage}`;
+    emailInput.value = '';
+    emailError.style.display = 'none';
+    paidMsg.innerHTML = '';
+    copiedMsg.textContent = '';
+    // مرحله ایمیل رو نشون بده
+    stepEmail.style.display = 'block';
+    stepWallet.style.display = 'none';
+    modalWrap.style.display = 'flex';
+    modalWrap.setAttribute('aria-hidden','false');
   });
+});
 
-  closeModal.addEventListener('click', () => modalWrap.style.display = 'none');
+/* بستن modal */
+closeModal.addEventListener('click', closeModalFn);
+cancelBtn.addEventListener('click', closeModalFn);
+function closeModalFn(){
+  modalWrap.style.display = 'none';
+  modalWrap.setAttribute('aria-hidden','true');
+}
 
-  submitOrder.addEventListener('click', async () => {
-    const email = emailInput.value.trim();
-    if (!email) {
-      modalMessage.innerHTML = '<div style="color:#ffcccb">لطفاً ایمیل معتبر وارد کنید.</div>';
+/* اعتبارسنجی ایمیل و رفتن به مرحله نمایش آدرس کیف پول */
+continueBtn.addEventListener('click', ()=>{
+  const email = emailInput.value.trim();
+  if(!validateEmail(email)){
+    emailError.textContent = 'لطفاً یک ایمیل معتبر وارد کنید.';
+    emailError.style.display = 'block';
+    return;
+  }
+  currentEmail = email;
+  emailError.style.display = 'none';
+  // تنظیم متن آدرس و مبلغ
+  walletAddressEl.textContent = WALLET_ADDRESS;
+  payAmountEl.textContent = currentAmount;
+  // لینک اکسپلورر را آماده کن
+  openWalletBtn.onclick = () => {
+    if(!WALLET_ADDRESS || WALLET_ADDRESS.includes('YOUR_BSC_WALLET_ADDRESS')){
+      alert('آدرس کیف پول واقعی تنظیم نشده. لطفاً آدرس را در کد جایگزین کنید.');
       return;
     }
-    // درخواست ارسال به سرور
-    submitOrder.disabled = true;
-    submitOrder.textContent = 'در حال ارسال...';
+    const url = WALLET_EXPLORER_PREFIX + encodeURIComponent(WALLET_ADDRESS);
+    window.open(url, '_blank');
+  };
+  // نمایش مرحله کیف پول
+  stepEmail.style.display = 'none';
+  stepWallet.style.display = 'block';
+});
 
-    try {
-      const resp = await fetch('/api/order', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ package: currentPackage, email })
-      });
-      const data = await resp.json();
-      if (!data.ok) {
-        modalMessage.innerHTML = `<div style="color:#ffcccb">${data.error || 'خطا در ارسال'}</div>`;
-      } else {
-        modalMessage.innerHTML = `<div class="success">سفارش شما ثبت شد. ما به زودی از طریق ایمیل با شما تماس می‌گیریم.</div>
-          <div style="margin-top:8px;font-size:13px;color:#bde0ff">آدرس قرارداد و اطلاعات پرداخت امن برای شما بعد از ثبت سفارش ارسال خواهد شد.</div>`;
-        // در اینجا ما آدرس قرارداد را به کاربر نشان نمیدهیم تا از فاش شدن جلوگیری شود
-        // اگر می‌خواهی آدرس قرارداد در همینجا نمایش داده شود، باید سرور آن را در پاسخ قرار دهد.
-      }
-    } catch (err) {
-      console.error(err);
-      modalMessage.innerHTML = '<div style="color:#ffcccb">خطا در اتصال به سرور. لطفاً بعداً تلاش کنید.</div>';
-    } finally {
-      submitOrder.disabled = false;
-      submitOrder.textContent = 'تأیید و ارسال سفارش';
+/* بازگشت به ایمیل */
+backToEmailBtn.addEventListener('click', ()=>{
+  stepWallet.style.display = 'none';
+  stepEmail.style.display = 'block';
+});
+
+/* کپی آدرس به کلیپ‌بورد */
+copyAddrBtn.addEventListener('click', async ()=>{
+  try{
+    if(!WALLET_ADDRESS || WALLET_ADDRESS.includes('YOUR_BSC_WALLET_ADDRESS')){
+      copiedMsg.textContent = 'آدرس کیف پول تنظیم نشده';
+      setTimeout(()=>{ copiedMsg.textContent = ''; }, 2500);
+      return;
     }
-  });
+    await navigator.clipboard.writeText(WALLET_ADDRESS);
+    copiedMsg.textContent = 'کپی شد';
+    copiedMsg.classList.add('copied');
+    setTimeout(()=>{ copiedMsg.textContent = ''; copiedMsg.classList.remove('copied'); }, 2500);
+  }catch(e){
+    copiedMsg.textContent = 'خطا در کپی';
+    setTimeout(()=>{ copiedMsg.textContent = ''; }, 2500);
+  }
+});
 
-  // کلیک بیرون modal → بستن
-  modalWrap.addEventListener('click', (e) => {
-    if (e.target === modalWrap) modalWrap.style.display = 'none';
-  });
+/* وقتی کاربر میگه پرداخت کردم — باز کردن پنجره ایمیل برای ارسال رسید */
+paidBtn.addEventListener('click', ()=>{
+  if(!validateEmail(currentEmail)){
+    paidMsg.innerHTML = `<div style="color:#ffb3b3">ایمیل معتبر در دسترس نیست. لطفاً دوباره آغاز کنید.</div>`;
+    return;
+  }
+  // mailto با subject و body پر شده
+  const subject = `ارسال رسید پرداخت — پکیج ${currentPackage}`;
+  const bodyLines = [
+    `سلام،`,
+    ``,
+    `من پرداخت خود را انجام دادم.`,
+    `پکیج: ${currentPackage}`,
+    `مبلغ پرداختی: ${currentAmount}`,
+    `ایمیل کاربر (برای پیگیری): ${currentEmail}`,
+    `آدرس کیف پول دریافت‌کننده: ${WALLET_ADDRESS}`,
+    `شبکه: BSC (Binance Smart Chain)`,
+    ``,
+    `لطفاً رسید (اسکرین‌شات یا تصویر تراکنش) را به این ایمیل پیوست کرده و ارسال کنید.`,
+    ``,
+    `با تشکر.`
+  ];
+  const body = encodeURIComponent(bodyLines.join('\n'));
+  const mailto = `mailto:${OWNER_EMAIL}?subject=${encodeURIComponent(subject)}&body=${body}`;
+
+  // باز کردن پنجره ایمیل کاربر (او باید اسکرین‌شات را ضمیمه کند)
+  window.location.href = mailto;
+
+  // پیام داخل modal نمایش بدیم تا کاربر بدونه مرحله بعد چیه
+  paidMsg.innerHTML = `<div class="note">پنجره ایمیل باز شد. لطفاً رسید (اسکرین‌شات) را **به عنوان فایل پیوست** اضافه و ارسال کنید. پس از ارسال، پرداخت بررسی و با شما تماس خواهیم گرفت.</div>`;
+});
+
+/* کمک‌کننده: اعتبارسنجی ایمیل */
+function validateEmail(email){
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+}
+
+/* بستن modal با کلیک خارج */
+modalWrap.addEventListener('click', (e)=>{
+  if(e.target === modalWrap) closeModalFn();
+});
 </script>
+
 </body>
 </html>
