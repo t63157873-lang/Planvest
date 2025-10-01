@@ -1,0 +1,5 @@
+cd my-site
+npm init -y
+npm install express helmet express-rate-limit nodemailer dotenv cors
+# (اختیاری) install nodemon برای توسعه:
+npm install --save-dev nodemon
